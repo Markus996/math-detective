@@ -179,7 +179,6 @@ def generate_logic_problem(level_name):
     if not problem:
         problem = {"desc": f"计算 **10 + 5**", "nums":[10,5], "logic_type":"合并", "distractors":["减少"], "op":"+", "equation":"10+5", "answer":"15"}
     
-    # 【关键修复】在此处并不打乱，而是在存入Session时只处理一次
     return problem
 
 # --- 3. 主程序 ---
@@ -219,6 +218,10 @@ def main():
             
         st.metric("🏆 连续破案", f"{st.session_state['solved_count']} 起")
 
+        # --- 👨‍💻 创作者信息 (新增) ---
+        st.markdown("---")
+        st.info("📌 **创作者微信**\n\n18980841817")
+
     # --- 主区域 ---
     st.markdown("# 🎓 聪博士AI乐园")
     
@@ -236,13 +239,11 @@ def main():
     elif st.session_state['mode'] == 'practice':
         p = st.session_state['problem']
         
-        # 【关键修复】在此处锁定选项顺序！
-        # 如果当前题目没有生成过“固定选项列表”，就生成一次并存下来
+        # 锁定选项顺序
         if 'shuffled_options' not in p:
             opts = [p['logic_type']] + p['distractors']
             random.shuffle(opts)
             p['shuffled_options'] = opts
-            # 这一步非常重要，它保证了无论后面怎么点，opts顺序都不变了
         
         # 顶部：题目展示
         st.markdown("### 📝 案情描述")
@@ -259,7 +260,6 @@ def main():
             st.markdown("#### 🕵️ 第一步：侦探分析")
             st.write("请问：这道题里的数字是什么关系？")
             
-            # 使用刚才锁定的 p['shuffled_options']
             user_choice = st.radio("选择逻辑关系：", p['shuffled_options'], label_visibility="collapsed")
             
             if st.button("确认分析"):
